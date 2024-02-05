@@ -51,7 +51,7 @@
 
     - name: Copy Prometheus Config     
       ansible.builtin.copy:
-        src: /home/avengers/prometheus.config
+        src: /home/avengers/CSC/CSC-Discovery/prometheus.config
         dest: /usr/local/src/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml
         owner: "{{ prometheus_os_user }}"
         group: "{{ prometheus_os_group }}"

@@ -26,7 +26,7 @@
 
     - name: Grafana dashboads template
       ansible.builtin.copy:
-        src: /home/avengers/PowerStore_Dashboards_Avengers.json
+        src: /home/avengers/CSC/CSC-Discovery/PowerStore_Dashboards_Avengers.json
         dest: /home/avengers/PowerStore_Dashboards_Avengers.json
         mode: '0775'
         force: yes

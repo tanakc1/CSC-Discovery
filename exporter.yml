@@ -20,12 +20,12 @@
 
     - name: Exporter Module Un-archive
       ansible.builtin.unarchive:
-        src: /home/avengers/discovery/exporter.tgz      
+        src: /home/avengers/CSC/CSC-Discovery/exporter.tgz      
         dest: /opt/dellemc/avengers  
 
     - name: Copy systemd service file
       ansible.builtin.copy:
-        src: /home/avengers/discovery/powerstore_exporter.service      
+        src: /home/avengers/CSC/CSC-Discovery/powerstore_exporter.service      
         dest: /etc/systemd/system/powerstore_exporter.service
         owner: root
         group: root
