@@ -1,3 +1,3 @@
 # CSC-Discovery
 
-This is demo ANsible PLAYBOOK for CSC Discovery session
+This is Ansible PLAYBOOK demo for CSC Discovery session
