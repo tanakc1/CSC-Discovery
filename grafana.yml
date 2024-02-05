@@ -1,0 +1,67 @@
+---
+- hosts: Cent85_25050
+  vars:
+    grafana_url: "http://172.31.25.50:3000"
+    grafana_port: "3000"
+    grafana_user: "admin"
+    grafana_password: "admin"
+    grafana_version: "9.5.14"
+    prometheus_url: "http://172.31.25.50:9090"
+  become: true
+
+  tasks:
+
+    - name: Pre-check Grafana
+      ansible.posix.firewalld:
+        port: "{{ grafana_port }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Grafana Install
+      ansible.builtin.dnf:
+        name: https://dl.grafana.com/enterprise/release/grafana-enterprise-{{ grafana_version }}-1.x86_64.rpm
+        state: present
+        disable_gpg_check: true      
+
+    - name: Grafana dashboads template
+      ansible.builtin.copy:
+        src: /home/avengers/PowerStore_Dashboards_Avengers.json
+        dest: /home/avengers/PowerStore_Dashboards_Avengers.json
+        mode: '0775'
+        force: yes
+
+    - name: Grafana Service
+      ansible.builtin.systemd:
+        name: grafana-server
+        state: started
+        enabled: true
+        daemon_reload: true
+
+    - name: Grafana DataSource 
+      community.grafana.grafana_datasource:
+        name: Prometheus
+        grafana_url: "{{ grafana_url }}"
+        grafana_user: "{{ grafana_user }}"
+        grafana_password: "{{ grafana_password }}"
+        ds_type: "prometheus"
+        ds_url: "{{ prometheus_url }}"
+      register: register_datasource
+
+    - name: Grafana Dashboard Configure
+      ansible.builtin.template:
+        src: templates/PowerStore_Dashboards_Avengers.json.j2
+        dest: /home/avengers/PowerStore_Dashboards_Avengers.json
+      vars:
+        datasource_uid: "{{ register_datasource.datasource.uid }}"    
+
+    - name: Grafana Dashboards Import
+      community.grafana.grafana_dashboard:
+       grafana_url: "{{ grafana_url }}"
+       grafana_user: "{{ grafana_user }}"
+       grafana_password: "{{ grafana_password }}"
+       state: present
+       overwrite: true
+       path: /home/avengers/PowerStore_Dashboards_Avengers.json    
+
+

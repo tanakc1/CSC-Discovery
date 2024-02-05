@@ -1,0 +1,13 @@
+
+volumes:
+
+  - vol_name: DELL PowerStore test_vol
+    vol_size: 4
+
+  - vol_name: DELL Ansible Volume Test 1
+    vol_size: 10    
+
+  - vol_name: DELL Ansible Volume Test 2
+    vol_size: 7    
+
+

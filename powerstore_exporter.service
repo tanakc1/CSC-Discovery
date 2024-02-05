@@ -1,0 +1,17 @@
+[Unit]
+Description=Prometheus Exporter - PowerStore Performance Monitoring system
+Documentation=https://vexpose.blog/2022/02/18/prometheus-exporter-for-powerstore/
+After=local-fs.target
+ConditionPthExists=/opt/dellemc/avengers
+
+[Service]
+Restart=no
+Type=simple
+ExecStart=/opt/dellemc/avengers/powerstore_exporter.sh
+ExecReload=/bin/kill -HUP $MAINPID
+TimeoutStopSec=20s
+SendSIGKILL=no
+
+[Install]
+WantedBy=multi-user.target
+

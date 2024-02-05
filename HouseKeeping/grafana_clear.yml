@@ -1,0 +1,56 @@
+---
+- hosts: Cent85_25050
+  vars:
+    grafana_url: "http://172.31.25.50:3000"
+    grafana_port: "3000"
+    grafana_user: "admin"
+    grafana_password: "admin"
+    grafana_version: "9.5.14"
+    prometheus_url: "http://172.31.25.50:9090"
+  become: true
+
+  tasks:
+
+    - name: Grafana Service Stop/Disable
+      ansible.builtin.systemd:
+        name: grafana-server.service
+        state: stopped
+        enabled: false
+
+    - name: Grafana Service FIle Remove       
+      ansible.builtin.file:
+        path: /etc/systemd/system/grafana-server.service
+        state: absent
+
+    - name: Grafana Dashboard File Remove       
+      ansible.builtin.file:
+        path: /home/avengers/PowerStore_Dashboards_Avengers.json
+        state: absent
+
+    - name: Grafana Uninstall
+      ansible.builtin.dnf:
+        name: grafana-enterprise.x86_64
+        state: absent
+        autoremove: yes  
+
+    - name: Pre-check Grafana
+      ansible.posix.firewalld:
+        port: "{{ grafana_port }}/tcp"
+        permanent: true
+        state: disabled
+
+    - name: Grafana directory remove #1
+      ansible.builtin.file:
+        path: /etc/grafana
+        state: absent
+
+    - name: Grafana directory remove #2
+      ansible.builtin.file:
+        path: /usr/share/grafana
+        state: absent
+
+    - name: Grafana directory remove #3
+      ansible.builtin.file:
+        path: /var/lib/grafana
+        state: absent
+

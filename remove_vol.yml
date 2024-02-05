@@ -1,0 +1,39 @@
+---
+- hosts: Rocky92_25052
+  connection: local
+  gather_facts: no
+
+  vars_files: vars/main_45_vars.yml
+
+  vars_prompt:
+    - name: volume_name
+      prompt: "Volume Name --> "
+      private: no
+    - name: vol_size
+      prompt: "LUN capacity GB --> "
+      private: no
+    - name: vol_cnt
+      prompt: "Volume Count --> "
+      private: no
+
+  tasks:
+  - name: multi volumes
+    register: result_vol
+    dellemc.powerstore.volume:
+      array_ip: "{{ array_ip }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+      verifycert: "{{ verifycert }}"
+      vol_name: "{{ volume_name + '_' }}{{ item }}"
+      size: "{{ vol_size }}"
+      cap_unit: "{{ cap_unit }}"
+
+      state: absent  
+
+      host: "{{ host_name }}"
+      mapping_state: unmapped  
+
+    loop: "{{ range(1, vol_cnt | int + 1 , 1) | list }}"
+
+
+

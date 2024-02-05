@@ -1,0 +1,42 @@
+---
+- hosts: Rocky92_25052
+  vars:
+    exporter_port: "8000"
+  become: true
+
+  tasks:
+
+    - name: Pre-check PowerStore_Exporter
+      ansible.posix.firewalld:
+        port: "{{ exporter_port }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Create Directory
+      ansible.builtin.file:
+        path: /opt/dellemc/avengers
+        state: directory      
+
+    - name: Module Un-archive
+      ansible.builtin.unarchive:
+        src: /home/avengers/discovery/exporter.tgz      
+        dest: /opt/dellemc/avengers  
+
+    - name: Copy systemd service file
+      ansible.builtin.copy:
+        src: /home/avengers/discovery/powerstore_exporter.service      
+        dest: /etc/systemd/system/powerstore_exporter.service
+        owner: root
+        group: root
+        mode: '0644'  
+
+    - name: PowerStore_Exporter Service
+      ansible.builtin.systemd:
+        name: powerstore_exporter
+        state: started
+        enabled: true
+        daemon_reload: true
+
+
+

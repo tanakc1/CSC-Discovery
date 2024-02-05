@@ -1,0 +1,31 @@
+---
+- hosts: Rocky92_25052
+  vars:
+    exporter_port: "8000"
+  become: true
+
+  tasks:
+
+    - name: PowerStore_Exporter Service stop/disable
+      ansible.builtin.systemd:
+        name: powerstore_exporter
+        state: stopped 
+        enabled: false
+
+    - name: Remove service file
+      ansible.builtin.file:
+        path: /etc/systemd/system/powerstore_exporter.service
+        state: absent      
+
+    - name: Remove Directory
+      ansible.builtin.file:
+        path: /opt/dellemc
+        state: absent      
+
+    - name: Firewall port disable
+      ansible.posix.firewalld:
+        port: "{{ exporter_port }}/tcp"
+#       permanent: true
+        state: disabled
+        immediate: true
+
