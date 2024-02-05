@@ -1,0 +1,50 @@
+---
+- hosts: localhost
+  vars:
+    exporter_port: "8000"
+  become: true
+
+  tasks:
+
+    - name: Pre-check PowerStore_Exporter
+      ansible.posix.firewalld:
+        port: "{{ exporter_port }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Copy Exporter Bring-Up Shell
+      ansible.builtin.copy:
+        src: /home/avengers/discovery/powerstore_exporter.sh
+        dest: /opt/dellemc/avengers/powerstore_exporter.sh      
+        owner: root
+        group: root
+        mode: '0744'   
+        backup: yes  
+
+    - name: Copy Exporter Python Script
+      ansible.builtin.copy:
+        src: /home/avengers/discovery/powerstore_exporter.py
+        dest: /opt/dellemc/avengers/powerstore_exporter.py      
+        owner: root
+        group: root
+        mode: '0744'   
+        backup: yes
+
+    - name: Copy systemd service file
+      ansible.builtin.copy:
+        src: /home/avengers/discovery/powerstore_exporter.service      
+        dest: /etc/systemd/system/powerstore_exporter.service
+        owner: root
+        group: root
+        mode: '0644'  
+
+    - name: PowerStore_Exporter Service
+      ansible.builtin.systemd:
+        name: powerstore_exporter
+        state: started
+        enabled: true
+        daemon_reload: true
+
+
+

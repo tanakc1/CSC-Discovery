@@ -1,0 +1,38 @@
+---
+- hosts: Cent85_25050
+  vars:
+    prometheus_port: "9090"
+    prometheus_os_group: "prometheus"
+    prometheus_os_user: "prometheus"
+    prometheus_version: "2.48.0"
+  become: true
+
+  tasks:
+
+    - name: Prometheus Service
+      ansible.builtin.systemd:
+        name: prometheus
+        state: stopped
+        enabled: false
+
+    - name: Prometheus Symbolic Link Remove
+      ansible.builtin.file:
+        path: /usr/local/prometheus
+        state: absent     
+
+    - name: Prometheus Remove       
+      ansible.builtin.file:
+        path: /usr/local/src/prometheus-2.48.0.linux-amd64
+        state: absent  
+
+    - name: Prometheus Config Remove
+      ansible.builtin.file:
+        path: /var/lib/prometheus
+        state: absent     
+
+    - name: Port disable Prometheus
+      ansible.posix.firewalld:
+        port: "{{ prometheus_port }}/tcp"
+        permanent: true
+        state: disabled
+       

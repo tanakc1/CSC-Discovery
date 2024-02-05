@@ -1,0 +1,8 @@
+array_ip: "172.31.25.45"  
+user: "admin"
+password: "P@ssw0rd1!"
+verifycert: False
+vol_name: "AVE_VOL"
+cap_unit: "GB"
+host_name: "R730-01"  
+

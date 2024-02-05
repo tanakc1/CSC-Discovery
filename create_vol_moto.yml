@@ -1,0 +1,33 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    array_ip: "172.31.25.40"  
+    user: "admin"
+    password: "Password1!"
+    verifycert: False
+    vol_name: "AVE_VOL"
+    cap_unit: "GB"
+
+#  collections:
+#  - dellemc.powerstore
+
+  tasks:
+  - name: multi volumes
+    register: result_vol
+    dellemc.powerstore.volume:
+      array_ip: "{{ array_ip }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+      verifycert: "{{ verifycert }}"
+      vol_name: "{{ vol_name + '_' }}{{ item }}"
+      size: 12
+      cap_unit: "{{ cap_unit }}"
+      state: present  
+    loop:
+      - 1
+      - 2
+
+

@@ -1,0 +1,70 @@
+---
+- hosts: Cent85_25050
+  vars:
+    prometheus_port: "9090"
+    prometheus_os_group: "prometheus"
+    prometheus_os_user: "prometheus"
+    prometheus_version: "2.48.0"
+  become: true
+
+  tasks:
+
+    - name: Pre-check Pormetheus
+      ansible.posix.firewalld:
+        port: "{{ prometheus_port }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: OS Group Add
+      ansible.builtin.group:
+        name: "{{ prometheus_os_group }}"
+        state: present
+
+    - name: OS User Add
+      ansible.builtin.user:
+        name: "{{ prometheus_os_user }}"
+        group: "{{ prometheus_os_group }}"      
+
+    - name: Prometheus DL and Install
+      ansible.builtin.unarchive:
+        src: https://github.com/prometheus/prometheus/releases/download/v{{prometheus_version}}/prometheus-{{prometheus_version}}.linux-amd64.tar.gz
+        dest: /usr/local/src  
+        owner: "{{ prometheus_os_user }}"  
+        group: "{{ prometheus_os_group }}"  
+        remote_src: true  
+
+    - name: Prometheus env create
+      ansible.builtin.file:
+        path: /var/lib/prometheus
+        state: directory
+        owner: "{{ prometheus_os_user }}"  
+        group: "{{ prometheus_os_group }}"  
+        mode: '0775'  
+
+    - name: Prometheus Symbolic Link
+      ansible.builtin.file:
+        src: /usr/local/src/prometheus-{{ prometheus_version }}.linux-amd64/prometheus
+        dest: /usr/local/prometheus  
+        state: link
+        force: yes
+
+    - name: Copy Prometheus Config     
+      ansible.builtin.copy:
+        src: /home/avengers/prometheus.config
+        dest: /usr/local/src/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml
+        owner: "{{ prometheus_os_user }}"
+        group: "{{ prometheus_os_group }}"
+        mode: '0775'
+  
+        force: yes
+
+    - name: Prometheus Service
+      ansible.builtin.systemd:
+        name: prometheus
+        state: started
+        enabled: true
+        daemon_reload: true
+
+
+

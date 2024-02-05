@@ -1,0 +1,32 @@
+---
+- hosts: Rocky92_25052
+  connection: local
+  gather_facts: no
+
+  vars_files: 
+    - vars/main_45_vars.yml
+    - vars/PS_VOL.yml
+
+  tasks:
+
+  - name: multi volumes
+    dellemc.powerstore.volume:
+
+      array_ip: "{{ array_ip }}"      
+      user: "{{ user }}"
+      password: "{{ password }}"
+      verifycert: "{{ verifycert }}"
+
+      vol_name: "{{ item.vol_name  }}"   # from PS_VOL
+      size: "{{ item.vol_size }}"        # from PS_VOL
+      cap_unit: "{{ cap_unit }}"
+
+      state: present  
+
+      host: "{{ host_name }}"
+      mapping_state: mapped
+
+    loop: "{{ volumes }}"      # Loop count = volume count from PS_VOL.yml
+
+
+
